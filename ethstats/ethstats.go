@@ -47,6 +47,9 @@ const (
 	// historyUpdateRange is the number of blocks a node should report upon login or
 	// history request.
 	historyUpdateRange = 50
+
+	wsReadBuffer  = 1024
+	wsWriteBuffer = 1024
 )
 
 // Service implements an Ethereum netstats reporting daemon that pushes local
@@ -183,7 +186,11 @@ func (s *Service) loop() {
 				conn *connWrapper
 				err  error
 			)
-			dialer := websocket.Dialer{HandshakeTimeout: 5 * time.Second}
+			dialer := websocket.Dialer{
+				HandshakeTimeout: 5 * time.Second,
+				ReadBufferSize:   wsReadBuffer,
+				WriteBufferSize:  wsWriteBuffer,
+			}
 			header := make(http.Header)
 			header.Set("origin", "http://localhost")
 			for _, url := range urls {
