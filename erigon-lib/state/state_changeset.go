@@ -19,6 +19,7 @@ package state
 import (
 	"bytes"
 	"encoding/binary"
+	"maps"
 	"math"
 	"sort"
 
@@ -55,14 +56,8 @@ type StateDiffDomain struct {
 
 func (d *StateDiffDomain) Copy() *StateDiffDomain {
 	res := &StateDiffDomain{}
-	res.keys = make(map[string][]byte)
-	res.prevValues = make(map[string][]byte)
-	for k, v := range d.keys {
-		res.keys[k] = v
-	}
-	for k, v := range d.prevValues {
-		res.prevValues[k] = v
-	}
+	res.keys = maps.Clone(d.keys)
+	res.prevValues = maps.Clone(d.prevValues)
 	return res
 }
 

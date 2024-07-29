@@ -23,6 +23,7 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"errors"
+	"maps"
 	"reflect"
 	"testing"
 	"time"
@@ -458,9 +459,7 @@ func (mr mapResolver) clear() {
 }
 
 func (mr mapResolver) add(m map[string]string) {
-	for k, v := range m {
-		mr[k] = v
-	}
+	mr = maps.Clone(m)
 }
 
 func (mr mapResolver) LookupTXT(ctx context.Context, name string) ([]string, error) {

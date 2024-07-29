@@ -24,6 +24,7 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
+	"maps"
 	"math"
 	"math/big"
 	"testing"
@@ -1821,10 +1822,7 @@ func TestDeleteRecreateSlotsAcrossManyBlocks(t *testing.T) {
 	chain, err := core.GenerateChain(m.ChainConfig, m.Genesis, m.Engine, m.DB, 150, func(i int, b *core.BlockGen) {
 		var exp = new(expectation)
 		exp.blocknum = i + 1
-		exp.values = make(map[int]int)
-		for k, v := range current.values {
-			exp.values[k] = v
-		}
+		exp.values = maps.Clone(current.values)
 		exp.exist = current.exist
 
 		b.SetCoinbase(libcommon.Address{1})
