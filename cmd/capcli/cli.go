@@ -32,14 +32,14 @@ import (
 
 	"github.com/spf13/afero"
 	"google.golang.org/grpc"
-
-	"github.com/erigontech/erigon-lib/log/v3"
+	"google.golang.org/grpc/credentials/insecure"
 
 	libcommon "github.com/erigontech/erigon-lib/common"
 	"github.com/erigontech/erigon-lib/common/datadir"
 	"github.com/erigontech/erigon-lib/downloader/snaptype"
 	sentinel "github.com/erigontech/erigon-lib/gointerfaces/sentinelproto"
 	"github.com/erigontech/erigon-lib/kv"
+	"github.com/erigontech/erigon-lib/log/v3"
 	"github.com/erigontech/erigon-lib/metrics"
 
 	"github.com/erigontech/erigon/cl/antiquary"
@@ -107,11 +107,17 @@ func (w *withPPROF) withProfile() {
 
 func (w *withSentinel) connectSentinel() (sentinel.SentinelClient, error) {
 	// YOLO message size
-	gconn, err := grpc.Dial(w.Sentinel, grpc.WithInsecure(), grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt)))
+	options := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(math.MaxInt)),
+	}
+
+	conn, err := grpc.NewClient(w.Sentinel, options...)
 	if err != nil {
 		return nil, err
 	}
-	return sentinel.NewSentinelClient(gconn), nil
+
+	return sentinel.NewSentinelClient(conn), nil
 }
 
 func openFs(fsName string, path string) (afero.Fs, error) {
